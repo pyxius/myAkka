@@ -1,9 +1,7 @@
 package sample.hello.mycode
-
-import org.scalatest.{ BeforeAndAfterAll, FlatSpecLike, Matchers }
-import akka.actor.{ Actor, Props, ActorSystem }
-import akka.testkit.{ ImplicitSender, TestKit, TestActorRef }
-import scala.concurrent.Await
+import akka.actor.{ActorSystem, Props}
+import akka.testkit.{TestActorRef, ImplicitSender, TestKit}
+import org.scalatest.{Matchers, BeforeAndAfterAll, FlatSpecLike}
 import scala.concurrent.duration._
 
 
@@ -18,7 +16,7 @@ class HelloAkkaSpec(_system: ActorSystem)
     def this() = this(ActorSystem("HelloAkkaSpec"))
 
     override def afterAll: Unit = {
-      system.terminate()
+      system.shutdown()
       system.awaitTermination(10.seconds)
 
     }
