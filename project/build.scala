@@ -12,4 +12,8 @@ object HelloWorldBuild extends Build {
 		.settings(libraryDependencies ++= compile(akkaActor, akkaTestkit, scalaTest)
 	)
 
+	lazy val persistence = Project("persistence", file("persistence"))
+		.settings(libraryDependencies ++= compile(akkaActor, akkaPersistence)
+	)
+
 }
