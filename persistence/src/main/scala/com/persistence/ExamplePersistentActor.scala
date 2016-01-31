@@ -24,9 +24,10 @@ class ExamplePersistentActor extends PersistentActor with ActorLogging{
 
   var state = ExampleState()
 
-  def updateState(event: Evt): Unit =
+  def updateState(event: Evt): Unit = {
+    log.info(s"Inside update state...$event")
     state = state.updated(event)
-
+  }
   def numEvents =
     state.size
 
@@ -42,36 +43,42 @@ class ExamplePersistentActor extends PersistentActor with ActorLogging{
 
   val receiveCommand: Receive = {
     case Cmd(data) =>
-      log.info(s"Shutting Down Actor System...")
       persist(Evt(s"${data}-${numEvents}"))(updateState)
-
-
       log.info(s"Inside Receive Command....")
 //      persist(Evt(s"${data}-${numEvents + 1}")) { event =>
 //        updateState(event)
 //        context.system.eventStream.publish(event)
 //      }
+      log.info("Sleeping before shutdown...")
+      Thread.sleep(10000)
+      log.info(s"Shutting Down Actor System...")
       context.system.shutdown()
 
     case "snap"  => saveSnapshot(state)
     case "print" => println(state)
   }
 
-
+  /**
+    *
+    * @return
+    */
   def recoveryExtender: Receive = {
     case WillNotProcessCmd(data) =>
+      log.info(s" Sending Recovery1,Recovery2 to Actor")
+      self ! Cmd("Recovery1")
+      self ! Cmd("print")
+
       log.info(s"Inside recovery extender waiting for 10 seconds...")
-      //log.info(s" Actor context is ${context}")
-      self ! Cmd("Cmd1")
-      self ! Cmd("Cmd2")
       Thread.sleep(10000)
       switchToDefaultContext
   }
 
   def switchToDefaultContext = {
-    log.info(s" Actor context is ${context}")
+    log.info(s" Actor context is ${context.self.path}")
     context become receiveCommand
-    self ! Cmd("Hello")
+    self ! Cmd("Command1")
+    self ! Cmd("print")
+
   }
 }
 
