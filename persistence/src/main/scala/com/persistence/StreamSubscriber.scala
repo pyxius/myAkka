@@ -78,7 +78,7 @@ class StreamSubscriber extends PersistentActor with ActorLogging {
 //      println(s"Inside processRecoveryEvents of StreamSubscriber. Got message ${data} will stash this message...")
 //      stash()
     case x =>
-      println(s"Unhandled msg in processRecoveryEvents...")
+      println(s"Unhandled msg in processRecoveryEvents...will stash it. ${x}")
       stash()
     case _ =>
       println(s"Absolutely Unhandled msg in processRecoveryEvents...")
