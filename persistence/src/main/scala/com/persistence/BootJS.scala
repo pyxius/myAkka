@@ -8,7 +8,7 @@ import akka.actor.{ActorSystem, Props}
 object BootJS extends App {
   val system = ActorSystem("mySystem")
   val ssRef = system.actorOf(Props[StreamSubscriber], "streamSubscriber")
-  val mssRef  = system.actorOf(MetaStreamSubscriber.props(ssRef))
+  val mssRef  = system.actorOf(MetaStreamSubscriber.props(ssRef), "metaStreamSubscriber")
 
   println("BootJS - Sending PAUSE to MSS...")
   mssRef ! PauseEvent("PAUSE")
