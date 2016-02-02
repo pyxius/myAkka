@@ -2,8 +2,9 @@ package com.persistence
 
 import akka.actor.ActorLogging
 import akka.persistence.{PersistentActor, RecoveryCompleted, SnapshotOffer}
-import scala.concurrent.Future
+
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 /**
   * StreamSubscriberState (this is persisted state of the Actor)
   *
@@ -27,7 +28,7 @@ class StreamSubscriber extends PersistentActor with ActorLogging {
   var state = StreamSubscriberState()
 
   def updateState(event: Evt): Unit = {
-    println(s"Inside update state...$event")
+    log.info(s"Inside update state...$event")
     state = state.updated(event)
   }
 
@@ -41,20 +42,20 @@ class StreamSubscriber extends PersistentActor with ActorLogging {
     */
   def receiveRecover: Receive = {
     case RecoveryCompleted =>
-      println(s"Recovery completed for StreamSubscriber. Changing StreamSubscriber context to processRecoveryEvents")
-      println("Simulating call delay to change context of SS to processRecoveryEvents")
+      log.info(s"Recovery completed for StreamSubscriber. Changing StreamSubscriber context to processRecoveryEvents")
+      log.info("Simulating call delay to change context of SS to processRecoveryEvents")
       val replay = Future {
         Thread.sleep(5000)
         "DelayInStateRecover"
       }
       replay onSuccess {
-        case "DelayInStateRecover" => println(s"DelayInStateRecover completed")
+        case "DelayInStateRecover" => log.info(s"DelayInStateRecover completed")
       }
       log.info(s"Changing context of SS to processRecoveryEvents")
       context become processRecoveryEvents
       self ! RecoveryExtender(5000)
     case evt: Evt => {
-      println(s"SS - Got an Evt from persisted state ${evt}")
+      log.info(s"SS - Got an Evt from persisted state ${evt}")
       updateState(evt)
     }
     case SnapshotOffer(_, snapshot: StreamSubscriberState) => state = snapshot
@@ -67,10 +68,10 @@ class StreamSubscriber extends PersistentActor with ActorLogging {
     */
   def receiveCommand: Receive = {
     case Cmd(data) =>
-      println(s"SS - Got msg ${data} in receiveCommand...")
+      log.info(s"SS - Got msg ${data} in receiveCommand...")
       persist(Evt(s"${data}-${numEvents}"))(updateState)
     case _ =>
-      println(s"Unhandled msg type in Receive Command...")
+      log.info(s"Unhandled msg type in Receive Command...")
   }
 
   /**
@@ -85,13 +86,13 @@ class StreamSubscriber extends PersistentActor with ActorLogging {
         "ReplayComplete"
       }
       replay onSuccess {
-        case "ReplayComplete" => println("Replay Completed...")
+        case "ReplayComplete" => log.info("Replay Completed...")
       }
       log.info(s"Full recovery done for StreamSubscriber(Replay completed) switching to receiveCommand mode...")
       context become receiveCommand
       unstashAll()
     case x =>
-      println(s"Unhandled msg in processRecoveryEvents...will stash it. ${x}")
+      log.info(s"Unhandled msg in processRecoveryEvents...will stash it. ${x}")
       stash()
   }
 
