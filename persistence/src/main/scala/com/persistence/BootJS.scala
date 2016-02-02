@@ -13,7 +13,7 @@ object BootJS extends App {
   println("BootJS - Sending PAUSE to MSS...")
   mssRef ! PauseEvent("PAUSE")
 
-  Thread.sleep(10000)
+  Thread.sleep(15000)
   println(s"BootJS - System shutting down")
   system.shutdown()
 }

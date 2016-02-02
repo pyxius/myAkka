@@ -1,10 +1,12 @@
 package com.persistence
 
 import akka.actor.ActorLogging
-import akka.persistence.{SnapshotOffer, RecoveryCompleted, PersistentActor}
-
+import akka.persistence.{PersistentActor, RecoveryCompleted, SnapshotOffer}
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * StreamSubscriberState (this is persisted state of the Actor)
+  *
   * @param events
   */
 case class StreamSubscriberState(events: List[String] = Nil) {
@@ -34,12 +36,21 @@ class StreamSubscriber extends PersistentActor with ActorLogging {
 
   /**
     * this is called when Actor recovers from a persisted state
+    *
     * @return
     */
   def receiveRecover: Receive = {
     case RecoveryCompleted =>
       println(s"Recovery completed for StreamSubscriber. Changing StreamSubscriber context to processRecoveryEvents")
-      println("Simulating call delay to change context of SS to processRecoveryEvents"); Thread.sleep(4000)
+      println("Simulating call delay to change context of SS to processRecoveryEvents")
+      val replay = Future {
+        Thread.sleep(5000)
+        "DelayInStateRecover"
+      }
+      replay onSuccess {
+        case "DelayInStateRecover" => println(s"DelayInStateRecover completed")
+      }
+      log.info(s"Changing context of SS to processRecoveryEvents")
       context become processRecoveryEvents
       self ! RecoveryExtender(5000)
     case evt: Evt => {
@@ -68,20 +79,20 @@ class StreamSubscriber extends PersistentActor with ActorLogging {
     */
   def processRecoveryEvents: Receive = {
     case RecoveryExtender(data) =>
-      println(s"StreamSubscriber has recovered from persistence and handling post recovery (Replay scenario)...for ${data} millis")
-      Thread.sleep(data)
-      println(s"Full recovery done for StreamSubscriber(Replay completed) switching to receiveCommand mode...")
-      unstashAll()
+      log.info(s"StreamSubscriber has recovered from persistence and handling post recovery (Replay scenario)...for ${data} millis")
+      val replay = Future {
+        Thread.sleep(data)
+        "ReplayComplete"
+      }
+      replay onSuccess {
+        case "ReplayComplete" => println("Replay Completed...")
+      }
+      log.info(s"Full recovery done for StreamSubscriber(Replay completed) switching to receiveCommand mode...")
       context become receiveCommand
-     // unstashAll()
-//    case Cmd(data) =>
-//      println(s"Inside processRecoveryEvents of StreamSubscriber. Got message ${data} will stash this message...")
-//      stash()
+      unstashAll()
     case x =>
       println(s"Unhandled msg in processRecoveryEvents...will stash it. ${x}")
       stash()
-    case _ =>
-      println(s"Absolutely Unhandled msg in processRecoveryEvents...")
   }
 
 }
