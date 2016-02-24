@@ -7,7 +7,7 @@ import akka.actor.{ActorSystem, Props}
   */
 object BootJS extends App {
   val system = ActorSystem("ClusterSystem")
-  val ssRef = system.actorOf(Props[Counter], "counter")
+  val ssRef = system.actorOf(Props[CounterSupervisor], "counter")
 
   Thread.sleep(5000)
 

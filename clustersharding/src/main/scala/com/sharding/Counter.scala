@@ -25,14 +25,24 @@ class Counter extends PersistentActor with ActorLogging {
 
   var count = 0
 
-  def updateState(event: CounterChanged): Unit =
+  /**
+    *
+    * @param event
+    */
+  def updateState(event: CounterChanged): Unit = {
+    log.info(s"inside update event")
     count += event.delta
+  }
 
   override def receiveRecover: Receive = {
     case evt: CounterChanged ⇒ updateState(evt)
     case msg => println(s"msg = $msg")
   }
 
+  /**
+    *
+    * @return
+    */
   override def receiveCommand: Receive = {
     case Increment ⇒
       println("Got Increment Message in Counter...")
