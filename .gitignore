@@ -1,5 +1,7 @@
 .git
 .hg
+.history
+classes
 **/target
 **/.settings
 *.classpath
