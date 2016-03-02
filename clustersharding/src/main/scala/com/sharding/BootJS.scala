@@ -9,8 +9,6 @@ object BootJS extends App {
   val system = ActorSystem("ClusterSystem")
   val ssRef = system.actorOf(Props[CounterSupervisor], "counter")
 
-  Thread.sleep(5000)
-
   println(ssRef.path)
   println("Ready to send message...")
   ssRef ! Get(2)

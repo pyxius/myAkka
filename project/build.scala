@@ -18,4 +18,7 @@ object HelloWorldBuild extends Build {
 
   lazy val clustersharding = Project("clustersharding", file("clustersharding"))
     .settings(libraryDependencies ++= compile(akkaActor, akkaPersistence, akkaCluster, akkaContrib, akkaTestkit))
+
+  lazy val futurePromise = Project("futurePromise", file("futurePromise"))
+    .settings(libraryDependencies ++= compile(akkaActor, scalaLogging, slf4j, logbackClassic))
 }
