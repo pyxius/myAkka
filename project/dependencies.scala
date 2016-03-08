@@ -12,6 +12,9 @@ object Versions {
   val scalaLoggingVersion = "2.1.2"
   val slf4jVersion = "1.7.12"
   val logbackClassicVersion = "1.1.3"
+
+  //SdpCommonsVersion
+  //val SdpCommonsVersion = "9.8.0"
 }
 
 /**
@@ -41,4 +44,7 @@ object Dependencies {
   lazy val scalaLogging = "com.typesafe.scala-logging" % "scala-logging-slf4j_2.10"  % scalaLoggingVersion
   lazy val slf4j = "org.slf4j" % "slf4j-api" % slf4jVersion
   lazy val logbackClassic = "ch.qos.logback" % "logback-classic" % logbackClassicVersion
+
+  //SDP-Commons
+  //lazy val sdpCommonsMonitoring = "com.deere.isg.sdp-commons" %% "sdp-commons-monitoring" % SdpCommonsVersion
 }
